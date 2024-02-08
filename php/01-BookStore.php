@@ -147,6 +147,11 @@ class ShoppingCart
         return $this->items;
     }
 
+    public function clearCart(): void
+    {
+        $this->items = [];
+    }
+
     public function removeItem(Book $book): void
     {
         $this->items = array_filter($this->items, fn($item) => $item !== $book);
@@ -231,7 +236,5 @@ $shoppingCart = new ShoppingCart();
 $user->register($bookstore);
 
 $shoppingCart->addItem($bookstore->displayAllBooks()[0]);
-
-
-
 print(new Purchase($user, $shoppingCart->displayAllBooks(), $shoppingCart->getTotalPrice(), date('Y-m-d')));
+$shoppingCart->clearCart();
