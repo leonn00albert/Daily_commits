@@ -10,4 +10,109 @@ Instructions:
     4. Test the script by running it from the command line or accessing it via a web browser.
     5. Handle any errors gracefully and log them to a file for later review.
 */
+
+class MockMail
+{
+    public static function mail($email, $subject, $message)
+    {
+        try {
+            echo "From: mock@email.com\n";
+            echo "To: $email\n";
+            echo "Subject: $subject\n";
+            echo "$message\n\n";
+            Logger::log("Email delivered to $email");    
+        }catch(Exception $e){ 
+            Logger::log($e->getMessage(), 'ERROR');
+        }
+     
+    }
+}
+
+
+
+class CSVReader
+{
+    private $file;
+    private $data;
+
+    public function __construct($file)
+    {
+        $this->file = $file;
+        $this->data = [];
+    }
+
+    public function read()
+    {
+        try{
+            if (($handle = fopen($this->file, "r")) !== FALSE) {
+                while (($row = fgetcsv($handle, 1000, ",")) !== FALSE) {
+                    $this->data[] = $row;
+                }
+                fclose($handle);
+                Logger::log("File $this->file read successfully");
+            }  
+        }catch(Exception $e){
+            Logger::log($e->getMessage(), 'ERROR');
+        }
+    
+    }
+
+    public function getData()
+    {
+        return $this->data;
+    }
+}
+
+class EmailSender
+{
+    private $recipients;
+    private $subject;
+    private $message;
+
+    public function __construct($recipients, $subject, $message)
+    {
+        $this->recipients = $recipients;
+        $this->subject = $subject;
+        $this->message = $message;
+    }
+
+    public function send()
+    {
+        foreach ($this->recipients as $recipient) {
+            try {
+
+                $name = $recipient[0];
+                $email = $recipient[1];
+                $greeting = "Dear $name,";
+                $body = "$greeting\n\n$this->message";
+                Logger::log("Invitation sent to $name <$email>");
+                MockMail::mail($email, $this->subject, $body);
+            }
+            catch(Exception $e) {
+                Logger::log($e->getMessage(), 'ERROR');
+            }
+     
+        }
+    }
+}
+
+class Logger {
+    static $file = 'log.txt';
+
+    public static function log($message, $level = 'INFO')
+    {
+        $date = date('Y-m-d H:i:s');
+        $log = "[$date][$level] $message\n";
+        file_put_contents(Logger::$file, $log, FILE_APPEND);
+    }
+}
+
+$csv = new CSVReader('files/recipients.csv');
+$csv->read();
+
+$recipients = $csv->getData();
+$subject = 'You are invited!';
+$message = 'Please join us for a special event.';
+$sender = new EmailSender($recipients, $subject, $message);
+$sender->send();
 ?>

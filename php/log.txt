@@ -1,0 +1,9 @@
+[2024-02-09 20:17:02][INFO] File files/recipients.csv read successfully
+[2024-02-09 20:17:02][INFO] Email delivered to Email
+[2024-02-09 20:17:02][INFO] Invitation sent to Name <Email>
+[2024-02-09 20:17:02][INFO] Email delivered to johndoe@example.com
+[2024-02-09 20:17:02][INFO] Invitation sent to John Doe <johndoe@example.com>
+[2024-02-09 20:17:02][INFO] Email delivered to janesmith@example.com
+[2024-02-09 20:17:02][INFO] Invitation sent to Jane Smith <janesmith@example.com>
+[2024-02-09 20:17:02][INFO] Email delivered to alexjohnson@example.com
+[2024-02-09 20:17:02][INFO] Invitation sent to Alex Johnson <alexjohnson@example.com>
