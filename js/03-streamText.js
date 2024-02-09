@@ -26,3 +26,37 @@ Challenge Tips:
     - Implement error handling and graceful termination of streams.
     - Consider memory usage and efficiency when designing your solution.
 */
+
+
+const fs = require('fs');
+
+const outputFileName = 'output.txt';
+const read = function (file) {
+
+    fs.createReadStream(file, {
+        highWaterMark: 100 * 1024 * 1024
+    }).on('data', (chunk) => {
+
+        fs.writeFile(outputFileName, chunk.toString().toUpperCase(), (err) => {
+            if (err) {
+                console.error(err);
+                return;
+            }
+        });
+
+    });
+
+
+}
+const memoryUsage = process.memoryUsage();
+
+// Print memory usage information
+console.log('Memory Usage:');
+console.log('  - Heap Total:', (memoryUsage.heapTotal / 1024 / 1024).toFixed(2), 'MB');
+console.log('  - Heap Used:', (memoryUsage.heapUsed / 1024 / 1024).toFixed(2), 'MB');
+console.log('  - External:', (memoryUsage.external / 1024 / 1024).toFixed(2), 'MB');
+console.log('  - RSS:', (memoryUsage.rss / 1024 / 1024).toFixed(2), 'MB');
+
+console.time('CPU Benchmark');
+read('files/input.txt');
+console.timeEnd('CPU Benchmark');
