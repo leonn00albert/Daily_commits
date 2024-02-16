@@ -40,8 +40,9 @@ class TaskScheduler {
 
     executeTasks() {
         const now = new Date();
-        tasks = this.file.readTasks();
+        let tasks = this.file.readTasks();
         tasks.forEach((task) => {
+             task = new Task(task.name, task.frequency, task.conditions, task.action);
             if (task.isDue(now)) {
                 try {
                     task.execute();
@@ -51,6 +52,7 @@ class TaskScheduler {
             }
         });
     }
+
 }
 
 class Task {
@@ -81,14 +83,15 @@ class Task {
         const { day, hour, minute } = this.frequency;
         return this.checkDate(date, day, hour, minute);
     }
+    checkDate(date, day, hour, minute) {
+        return date.getDay() === day && date.getHours() === hour && date.getMinutes() === minute;
+    }
 
     execute() {
         this.action();
     }
 
-    checkDate(date, day, hour, minute) {
-        return date.getDay() === day && date.getHours() === hour && date.getMinutes() === minute;
-    }
+ 
 }
 
 class Runner {
