@@ -10,6 +10,19 @@ class IpfsUploader {
        
     }
 
+    stat = async () => {
+
+        const ipfs =  await IPFS.create();
+        const { id, agentVersion, protocolVersion } = await ipfs.id();
+        console.log('IPFS node information:');
+        console.log('ID:', id);
+        console.log('Agent version:', agentVersion);
+        console.log('Protocol version:', protocolVersion);
+        const repoStats = await ipfs.repo.stat();
+        console.log('Repo stats:', repoStats);
+
+    }
+
     async uploadFile(filePath) {
         const ipfs =  await IPFS.create();
         const fileContent = fs.readFileSync(filePath);
@@ -49,6 +62,8 @@ class CLI {
 
     promptFileUploaded(cid) {
         console.log('File uploaded successfully. IPFS CID:', cid);
+        const ipfsGatewayURL = `https://ipfs.io/ipfs/${cid}`;
+        console.log('Access the file via:', ipfsGatewayURL);
     }
 
     promptError(error) {
