@@ -12,10 +12,23 @@ Implement a class named 'ProductManager' that:
     has a method 'addProduct' that takes a 'Product' object as a parameter and adds it to the 'products' array.
     has a method 'getProductById' that takes an ID (number) as a parameter and returns the corresponding 'Product' object if found, otherwise returns null.
 
-*/
+Define a generic class named 'Stack' that represents a basic stack data structure (Last In, First Out).
 
-interface Product  {
-    id : number
+    It should have a private array property to store the stack elements.
+    Implement methods 'push' to add an element to the stack, 'pop' to remove and return the top element from the stack, and 'isEmpty' to check if the stack is empty.
+
+Create an instance of 'Stack' with number type and demonstrate pushing, popping, and checking if it's empty.
+Extend the 'Stack' class to a new class named 'TypedStack' that allows only a specific type of elements (using generics).
+
+    Ensure that attempting to push an element of a different type results in a compilation error.
+
+Create an instance of 'TypedStack' with string type and demonstrate the functionality.
+
+    */
+
+
+interface Product {
+    id: number
     name: string,
     price: number
     description: string
@@ -24,24 +37,22 @@ interface Product  {
 class ProductManager {
     private products: Product[];
 
-    constructor(){
+    constructor() {
         this.products = [];
     }
 
-    addProduct(product :Product ):void
-    {
+    addProduct(product: Product): void {
         this.products.push(product)
     }
-    getProductById(id:number):Product | undefined
-    {
-        return this.products.find( p => p.id === id);
+    getProductById(id: number): Product | undefined {
+        return this.products.find(p => p.id === id);
     }
 
 }
 
 
 const manager = new ProductManager();
-const product:Product = {
+const product: Product = {
     id: 0,
     name: 'test',
     price: 10,
@@ -49,4 +60,31 @@ const product:Product = {
 }
 
 manager.addProduct(product);
-console.log(manager.getProductById(1));
+console.log(manager.getProductById(0));
+
+
+class Stack<T> {
+    private array: T[];
+
+    constructor(){
+        this.array = []
+    }
+    push(elm:T){
+        this.array = [...this.array,elm];
+    }
+    pop():T | undefined{
+        return this.array.pop();
+    }
+    isEmpty():boolean
+    {
+        return this.array.length == 0;
+    }
+}
+
+const stack  = new Stack<number>();
+ 
+stack.push(2);
+
+stack.push(3);
+
+console.log(stack)
