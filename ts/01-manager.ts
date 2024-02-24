@@ -62,29 +62,3 @@ const product: Product = {
 manager.addProduct(product);
 console.log(manager.getProductById(0));
 
-
-class Stack<T> {
-    private array: T[];
-
-    constructor(){
-        this.array = []
-    }
-    push(elm:T){
-        this.array = [...this.array,elm];
-    }
-    pop():T | undefined{
-        return this.array.pop();
-    }
-    isEmpty():boolean
-    {
-        return this.array.length == 0;
-    }
-}
-
-const stack  = new Stack<number>();
- 
-stack.push(2);
-
-stack.push(3);
-
-console.log(stack)
