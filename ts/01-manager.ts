@@ -27,7 +27,7 @@ Create an instance of 'TypedStack' with string type and demonstrate the function
     */
 
 
-interface Product {
+interface Product1 {
     id: number
     name: string,
     price: number

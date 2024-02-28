@@ -17,5 +17,57 @@
 
 
 interface Product {
-    
+    operation():string;
 }
+
+
+class ConcreteProduct1 implements Product {
+    operation(): string {
+        return "Product1";
+    }
+}
+class ConcreteProduct2 implements Product {
+    operation(): string {
+        return "Product2";
+    }
+}
+interface Factory {
+    createProduct():Product;
+}
+
+class ConcreteFactory1 implements Factory {
+    createProduct(): Product {
+        return new ConcreteProduct1();
+    }
+}
+
+class ConcreteFactory2 implements Factory {
+    createProduct(): Product {
+        return new ConcreteProduct2();
+    }
+}
+
+
+class Client {
+    private factory:Factory;
+
+    constructor(factory:Factory){
+        this.factory = factory;
+    }
+    
+    someOperation():void
+    {
+        console.log(this.factory.createProduct().operation());
+    }
+}
+
+function main(){
+    const client1 = new Client(new ConcreteFactory1);
+    const client2 = new Client(new ConcreteFactory2);
+
+    client1.someOperation();
+    client2.someOperation();
+
+}
+
+main();
