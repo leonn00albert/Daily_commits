@@ -18,6 +18,7 @@ var Head = /** @class */ (function () {
             node.prev = this.list;
             this.list.next = node;
         }
+        return this;
     };
     Head.prototype.forward = function () {
         if (this.list) {
@@ -37,6 +38,7 @@ var Head = /** @class */ (function () {
         for (var i = this.position; i > 0; i--) {
             this.backward();
         }
+        return this;
     };
     Head.prototype.print = function () {
         if (this.list) {
@@ -50,9 +52,4 @@ var Head = /** @class */ (function () {
 }());
 var linkedList = new LinkNode("test");
 var head = new Head(linkedList);
-head.add(new LinkNode("test2"));
-head.forward();
-head.add(new LinkNode("test3"));
-head.forward();
-head.start();
-head.print();
+head.add(new LinkNode("test2")).forward().add(new LinkNode("test3")).forward().start().print();

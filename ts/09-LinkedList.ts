@@ -28,6 +28,7 @@ class Head {
             node.prev = this.list;
             this.list.next = node;
         }
+        return this;
     }
 
     forward(){
@@ -51,6 +52,7 @@ class Head {
         for(let i = this.position; i > 0; i--){
             this.backward();
         }
+        return this;
        
     }
     print(){
@@ -64,13 +66,8 @@ class Head {
 }
 let linkedList = new LinkNode("test",);
 const head = new Head(linkedList);
-head.add(new LinkNode("test2"));
-head.forward();
-head.add(new LinkNode("test3"))
-head.forward();
-head.start();
+head.add(new LinkNode("test2")).forward().add(new LinkNode("test3")).forward().start().print();
 
 
 
-head.print();
 
