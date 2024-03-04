@@ -16,6 +16,9 @@ var Head = /** @class */ (function () {
     Head.prototype.add = function (node) {
         if (this.list) {
             node.prev = this.list;
+            if (this.list.next) {
+                node.next = this.list.next;
+            }
             this.list.next = node;
         }
         return this;
@@ -40,6 +43,15 @@ var Head = /** @class */ (function () {
         }
         return this;
     };
+    Head.prototype.end = function () {
+        if (this.list) {
+            while (this.list.next) {
+                this.forward();
+                console.log(this.position);
+            }
+        }
+        return this;
+    };
     Head.prototype.print = function () {
         if (this.list) {
             console.log(this.list.data);
@@ -47,9 +59,10 @@ var Head = /** @class */ (function () {
         else {
             console.log('no list');
         }
+        return this;
     };
     return Head;
 }());
 var linkedList = new LinkNode("test");
 var head = new Head(linkedList);
-head.add(new LinkNode("test2")).forward().add(new LinkNode("test3")).forward().start().print();
+head.add(new LinkNode("test2")).forward().add(new LinkNode("test3")).add(new LinkNode("test4")).forward().forward().print().start().print().end().print();
