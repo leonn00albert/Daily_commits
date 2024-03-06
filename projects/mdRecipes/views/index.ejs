@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe Book</title>
+    <link rel="stylesheet" href="/public/styles.css" type="text/css"  type="text/css">
+</head>
+<body>
+    <h1>Recipe Book</h1>
+
+    <form action="/save" method="post">
+        <textarea name="recipe" rows="10" cols="50" placeholder="Enter your recipe in Markdown format"></textarea>
+        <br>
+        <button type="submit">Save Recipe</button>
+    </form>
+
+    <h2>Recipes</h2>
+    <ul>
+        <% recipes.forEach(recipe => { %>
+            <li>
+                <h3><%= recipe.title %></h3>
+                <div><%= recipe.content %></div>
+            </li>
+        <% }); %>
+    </ul>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</body>
+</html>
