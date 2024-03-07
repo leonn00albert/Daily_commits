@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recipe Book</title>
     <link rel="stylesheet" href="/public/styles.css" type="text/css"  type="text/css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
     <h1>Recipe Book</h1>
@@ -20,11 +23,20 @@
         <% recipes.forEach(recipe => { %>
             <li>
                 <h3><%= recipe.title %></h3>
-                <div><%= recipe.content %></div>
+                <div class="recipe-content" ><%= recipe.content %></div>
             </li>
         <% }); %>
     </ul>
+    <div id="content">
 
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    </div>
+    <script>
+        const easyMDE = new EasyMDE();
+        const recipeContent = document.querySelectorAll('.recipe-content');
+        recipeContent.forEach(c => {
+            c.innerHTML =  marked.parse(c.innerHTML);
+        })
+
+        </script>
 </body>
 </html>
