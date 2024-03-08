@@ -12,7 +12,8 @@ const db = new sqlite3.Database('recipes.db');
 db.run(`CREATE TABLE IF NOT EXISTS recipes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     title TEXT,
-    content TEXT
+    content TEXT,
+    category TEXT
 )`);
 
 app.set('view engine', 'ejs');
@@ -28,14 +29,21 @@ app.get('/', (req, res) => {
             res.sendStatus(500);
             return;
         }
-        res.render('index', { recipes });
+        const result = {};
+        recipes.forEach(r => {
+            if (!result[r.category]) {
+                result[r.category] = [];
+            }
+            result[r.category].push(r);
+        });
+        res.render('index', { recipes: result, categories: Object.keys(result) });
     });
 });
 
 app.post('/save', (req, res) => {
-    const { recipe } = req.body;
+    const { recipe, category } = req.body;
     if (recipe) {
-        db.run('INSERT INTO recipes (title, content) VALUES (?, ?)', ['New Recipe', recipe], (err) => {
+        db.run('INSERT INTO recipes (title, content, category) VALUES (?, ?, ?)', ['New Recipe', recipe, category], (err) => {
             if (err) {
                 console.error('Error saving recipe:', err);
                 res.sendStatus(500);
