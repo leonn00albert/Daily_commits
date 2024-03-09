@@ -21,19 +21,26 @@ var Head = /** @class */ (function () {
             }
             this.list.next = node;
         }
+        else {
+            this.list = node;
+        }
         return this;
     };
     Head.prototype.forward = function () {
         if (this.list) {
-            this.list = this.list.next;
-            this.position++;
+            if (this.list.next) {
+                this.list = this.list.next;
+                this.position++;
+            }
         }
         return this;
     };
     Head.prototype.backward = function () {
         if (this.list && this.position != 0) {
-            this.list = this.list.prev;
-            this.position--;
+            if (this.list.prev) {
+                this.list = this.list.prev;
+                this.position--;
+            }
         }
         return this;
     };
@@ -47,7 +54,6 @@ var Head = /** @class */ (function () {
         if (this.list) {
             while (this.list.next) {
                 this.forward();
-                console.log(this.position);
             }
         }
         return this;
@@ -61,8 +67,21 @@ var Head = /** @class */ (function () {
         }
         return this;
     };
+    Head.prototype.reset = function () {
+        this.list = undefined;
+        this.position = 0;
+        return this;
+    };
+    Head.prototype.getPosition = function () {
+        return this.position;
+    };
     return Head;
 }());
 var linkedList = new LinkNode("test");
 var head = new Head(linkedList);
-head.add(new LinkNode("test2")).forward().add(new LinkNode("test3")).add(new LinkNode("test4")).forward().forward().print().start().print().end().print();
+head.add(new LinkNode("test2")).forward().add(new LinkNode("test3")).add(new LinkNode("test4")).forward().forward().print().start().end();
+head.print().reset().print();
+head.add(new LinkNode("test2"));
+head.add(new LinkNode("test2"));
+head.forward();
+console.log(head.getPosition());

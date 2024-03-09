@@ -31,14 +31,19 @@ class Head {
             }
             this.list.next = node;
       
+        }else{
+            this.list = node;
         }
         return this;
     }
 
     forward(){
         if(this.list){
-            this.list = this.list.next;
-            this.position++;
+            if(this.list.next){
+                this.list = this.list.next;
+                this.position++;
+            }
+        
         }
 
         return this;
@@ -46,8 +51,11 @@ class Head {
 
     backward(){
         if(this.list && this.position!= 0){
-            this.list = this.list.prev;
-            this.position--
+            if(this.list.prev){
+                this.list = this.list.prev;
+                this.position--
+
+            }
         }
         return this;
     }
@@ -77,10 +85,26 @@ class Head {
         return this;
     }
 
+    reset(){
+        this.list = undefined;
+        this.position = 0;
+        return this;
+    }
+
+    getPosition():number
+    {
+        return this.position;
+    }
 }
 let linkedList = new LinkNode("test",);
 const head = new Head(linkedList);
-head.add(new LinkNode("test2")).forward().add(new LinkNode("test3")).add(new LinkNode("test4")).forward().forward().print().start().print().end().print();
+head.add(new LinkNode("test2")).forward().add(new LinkNode("test3")).add(new LinkNode("test4")).forward().forward().print().start().end();
+head.print().reset().print();
+head.add(new LinkNode("test2"))
+head.add(new LinkNode("test2"))
+
+head.forward();
+console.log(head.getPosition())
 
 
 
