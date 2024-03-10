@@ -26,20 +26,34 @@
             <label for="exampleSelect1" class="form-label mt-4">Category</label>
             <div class="row">
                 <div class="col">
+
                     <select name="category" class="form-select" id="exampleSelect1">
-                        <option>
-                            French
-                        </option>
-                        <option>
-                            Italian
-                        </option>
-                        <option>
-                            Chinese
-                        </option>
+                        <% categories.forEach(category=> { %>
+                            <option>
+                                <%= category.name %>
+                            </option>
+
+                            <% }); %>
+
                     </select>
                 </div>
                 <div class="col">
                     <button class="btn btn-primary" type="submit">Save Recipe</button>
+
+                </div>
+            </div>
+
+        </form>
+
+        <form action="/categories" method="post">
+            <label for="exampleSelect1" class="form-label mt-4">Category</label>
+            <div class="row">
+                <div class="col">
+                    <input type="text" name="name" class="form-control" id="exampleSelect1" />
+
+                </div>
+                <div class="col">
+                    <button class="btn btn-primary" type="submit">Create Category</button>
 
                 </div>
             </div>
@@ -53,39 +67,44 @@
 
 
         <ul class="nav nav-tabs" role="tablist">
-            <% categories.forEach(category => { %>
+            <% categories.forEach(category=> { %>
                 <li class="nav-item" role="presentation">
-                    <a class="nav-link" data-bs-toggle="tab" id="<%= category %>-tab" href="#<%= category %>" aria-selected="false" role="tab">
-                        <%= category %>
+                    <a class="nav-link" data-bs-toggle="tab" id="<%= category %>-tab" href="#<%= category.name %>"
+                        aria-selected="false" role="tab">
+                        <%= category.name %>
                     </a>
                 </li>
-            <% }); %>
+                <% }); %>
         </ul>
         <div id="myTabContent" class="tab-content">
             <% categories.forEach(category => { %>
-                <div class="tab-pane fade" id="<%= category %>" role="tabpanel">
+                <div class="tab-pane fade" id="<%= category.name %>" role="tabpanel">
                     <ul>
-                        <% recipes[category].forEach(recipe => { %>
-                            <li>
-                                <h3><%= recipe.title %></h3>
-                                <div class="recipe-content">
-                                    <%= recipe.content %>
-                                </div>
-                            </li>
-                        <% }); %>
+                        <% if (recipes[category.name]) { %>
+                            <% recipes[category.name].forEach(recipe => { %>
+                                <li>
+                                    <h3><%= recipe.title %></h3>
+                                    <div class="recipe-content"><%= recipe.content %></div>
+                                </li>
+                            <% }); %>
+                        <% } else { %>
+                            <li>No recipes found for this category.</li>
+                        <% } %>
                     </ul>
                 </div>
             <% }); %>
         </div>
-  
-    <script>
-        const easyMDE = new EasyMDE();
-        const recipeContent = document.querySelectorAll('.recipe-content');
-        recipeContent.forEach(c => {
-            c.innerHTML = marked.parse(c.innerHTML);
-        })
+        
+        
 
-    </script>
+        <script>
+            const easyMDE = new EasyMDE();
+            const recipeContent = document.querySelectorAll('.recipe-content');
+            recipeContent.forEach(c => {
+                c.innerHTML = marked.parse(c.innerHTML);
+            })
+
+        </script>
 </body>
 
 </html>

@@ -16,6 +16,12 @@ db.run(`CREATE TABLE IF NOT EXISTS recipes (
     category TEXT
 )`);
 
+
+db.run(`CREATE TABLE IF NOT EXISTS categories (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name
+)`);
+
 app.set('view engine', 'ejs');
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -23,22 +29,36 @@ app.use('/public', express.static(path.join(__dirname, 'public'), {
     extensions: ['js', 'css']
 }));
 app.get('/', (req, res) => {
+
     db.all('SELECT * FROM recipes', (err, recipes) => {
         if (err) {
             console.error('Error getting recipes:', err);
             res.sendStatus(500);
             return;
         }
-        const result = {};
-        recipes.forEach(r => {
-            if (!result[r.category]) {
-                result[r.category] = [];
+        
+        db.all('SELECT * FROM categories', (err, categories) => {
+            if (err) {
+                console.error('Error getting categories:', err);
+                res.sendStatus(500);
+                return;
             }
-            result[r.category].push(r);
+
+            const result = {};
+            recipes.forEach(r => {
+                if (!result[r.category]) {
+                    result[r.category] = [];
+                }
+                result[r.category].push(r);
+            });
+            console.log(result)
+            console.log(categories)
+            res.render('index', { recipes: result, categories: categories });
         });
-        res.render('index', { recipes: result, categories: Object.keys(result) });
     });
 });
+
+
 
 app.post('/save', (req, res) => {
     const { recipe, category } = req.body;
@@ -46,6 +66,22 @@ app.post('/save', (req, res) => {
         db.run('INSERT INTO recipes (title, content, category) VALUES (?, ?, ?)', ['New Recipe', recipe, category], (err) => {
             if (err) {
                 console.error('Error saving recipe:', err);
+                res.sendStatus(500);
+                return;
+            }
+            res.redirect('/');
+        });
+    } else {
+        res.sendStatus(400);
+    }
+});
+
+app.post('/categories', (req, res) => {
+    const { name } = req.body;
+    if (name) {
+        db.run('INSERT INTO categories (name) VALUES (?)', [name], (err) => {
+            if (err) {
+                console.error('Error saving category:', err);
                 res.sendStatus(500);
                 return;
             }
