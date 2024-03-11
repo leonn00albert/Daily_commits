@@ -1,0 +1,23 @@
+<%- include('../partials/header') %>
+<%- include('../partials/nav') %>
+    <div class="container">
+        <h3>
+            <%= recipe.title %>
+        </h3>
+        <div class="recipe-content">
+            <%= recipe.content %>
+        </div>
+    </div>
+
+
+
+    <script>
+        const easyMDE = new EasyMDE();
+        const recipeContent = document.querySelectorAll('.recipe-content');
+        recipeContent.forEach(c => {
+            c.innerHTML = marked.parse(c.innerHTML);
+        })
+
+    </script>
+
+<%- include('../partials/footer') %>

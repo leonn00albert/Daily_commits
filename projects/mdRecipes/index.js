@@ -51,12 +51,25 @@ app.get('/', (req, res) => {
                 }
                 result[r.category].push(r);
             });
-            console.log(result)
-            console.log(categories)
+     
             res.render('index', { recipes: result, categories: categories });
         });
     });
 });
+
+app.get('/recipes/:id', (req, res) => {
+
+    const recipeId = req.params.id
+    db.all('SELECT * FROM recipes WHERE id = ? LIMIT 1', [recipeId], (err, recipe) => {
+        if (err) {
+            console.error('Error getting recipe:', err);
+            return;
+        }
+        recipe = recipe[0];
+        res.render('recipes/view', { recipe});
+    });
+});
+
 
 
 
