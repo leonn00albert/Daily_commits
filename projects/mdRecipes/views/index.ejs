@@ -2,22 +2,39 @@
 <%- include('./partials/nav') %>
     <div class="container">
         <h1>Recipe Book</h1>
-
+        <div class="container">
+            <div class="row justify-content-center"> <!-- Center the row horizontally -->
+                <div class="col-md-6"> <!-- Adjust the column width as needed -->
+                    <div class="m-3">
+                        <form action="/getRecipe" method="post">
+                            <div class="row">
+                                <div class="col">
+                                    <input type="text" name="message" class="form-control" id="exampleSelect1" />
+                                </div>
+                                <div class="col">
+                                    <button class="btn btn-primary" type="submit" id="getBtn">Get Recipe</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+  
         <form action="/save" method="post">
+            <input type="hidden" id="title" name="title"/>
             <textarea name="recipe" rows="10" cols="50" placeholder="Enter your recipe in Markdown format"></textarea>
             <br>
             <label for="exampleSelect1" class="form-label mt-4">Category</label>
             <div class="row">
                 <div class="col">
-
                     <select name="category" class="form-select" id="exampleSelect1">
                         <% categories.forEach(category=> { %>
                             <option>
                                 <%= category.name %>
                             </option>
-
-                            <% }); %>
-
+                        <% }); %>
                     </select>
                 </div>
                 <div class="col">
@@ -44,10 +61,6 @@
         </form>
 
         <h2>Recipes</h2>
-
-
-
-
 
         <ul class="nav nav-tabs" role="tablist">
             <% categories.forEach(category=> { %>
@@ -86,5 +99,42 @@
                 c.innerHTML = marked.parse(c.innerHTML);
             })
 
+  
+            document.addEventListener('DOMContentLoaded', async () => {
+                const form = document.querySelector('form[action="/getRecipe"]');
+                const textarea = document.querySelector('textarea[name="recipe"]');
+                const getBtn = document.getElementById('getBtn');
+                const title = document.getElementById('title');
+
+                form.addEventListener('submit', async (event) => {
+                    event.preventDefault();
+                    const formData = new FormData(form);
+                    const message = formData.get('message');
+                    
+                    try {
+                        getBtn.disabled = true;
+                        easyMDE.value('## Loading...');
+                        easyMDE.togglePreview();
+
+                        const response = await fetch('/getRecipe', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ message })
+                        });
+                        const data = await response.json();
+                        const recipe = data.recipe;
+        
+                        easyMDE.value(recipe.message.content);
+                        const firstLine = recipe.message.content.split('\n')[0].replace(/#/g, "");
+                        title.value = firstLine;
+                        getBtn.disabled = false;
+                    } catch (error) {
+                        console.error('Error:', error);
+                    }
+                });
+            });
         </script>
+        
 <%- include('./partials/footer') %>

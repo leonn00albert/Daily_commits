@@ -29,6 +29,8 @@ db.run(`CREATE TABLE IF NOT EXISTS categories (
 app.set('view engine', 'ejs');
 
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json({ extended: true }));
+
 app.use('/public', express.static(path.join(__dirname, 'public'), {
     extensions: ['js', 'css']
 }));
@@ -65,17 +67,16 @@ app.get('/', (req, res) => {
 app.post('/getRecipe', async (req, res) => {
     try {
         const { message } = req.body;
-
-        // Call ChatGPT with user message
-        const response = await openai.complete({
-            engine: 'text-davinci-002', // Or any other appropriate model
-            prompt: `Get recipe for ${message}`,
-            maxTokens: 150,
-            stop: ['\n'],
-        });
+        const response = await openai.chat.completions.create({
+            messages: [{"role": "system", "content": "You are a home cook."},
+                {"role": "user", "content": "Create a recipe for : " + message + ' and write it down in markdown format' } ],
+              
+           
+            model: "gpt-3.5-turbo",
+          });
 
         // Extract recipe suggestion from the response
-        const recipe = response.data.choices[0].text.trim();
+        const recipe = response.choices[0];
 
         // Respond with the recipe
         res.json({ recipe });
@@ -102,9 +103,10 @@ app.get('/recipes/:id', (req, res) => {
 
 
 app.post('/save', (req, res) => {
-    const { recipe, category } = req.body;
+    console.log(req.body)
+    const { recipe, category,title } = req.body;
     if (recipe) {
-        db.run('INSERT INTO recipes (title, content, category) VALUES (?, ?, ?)', ['New Recipe', recipe, category], (err) => {
+        db.run('INSERT INTO recipes (title, content, category) VALUES (?, ?, ?)', [title, recipe, category], (err) => {
             if (err) {
                 console.error('Error saving recipe:', err);
                 res.sendStatus(500);
