@@ -4,9 +4,13 @@ const marked = require('marked');
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const app = express();
+const { OpenAI } = require('openai');
+require('dotenv').config();
+
 const PORT = process.env.PORT || 4000;
 
 const db = new sqlite3.Database('recipes.db');
+const openai = new OpenAI(process.env.OPENAI_API_KEY);
 
 // Create table if not exists
 db.run(`CREATE TABLE IF NOT EXISTS recipes (
@@ -55,6 +59,30 @@ app.get('/', (req, res) => {
             res.render('index', { recipes: result, categories: categories });
         });
     });
+});
+
+
+app.post('/getRecipe', async (req, res) => {
+    try {
+        const { message } = req.body;
+
+        // Call ChatGPT with user message
+        const response = await openai.complete({
+            engine: 'text-davinci-002', // Or any other appropriate model
+            prompt: `Get recipe for ${message}`,
+            maxTokens: 150,
+            stop: ['\n'],
+        });
+
+        // Extract recipe suggestion from the response
+        const recipe = response.data.choices[0].text.trim();
+
+        // Respond with the recipe
+        res.json({ recipe });
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
 });
 
 app.get('/recipes/:id', (req, res) => {
