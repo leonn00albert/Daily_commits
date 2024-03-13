@@ -42,7 +42,7 @@ app.get('/', (req, res) => {
             res.sendStatus(500);
             return;
         }
-        
+
         db.all('SELECT * FROM categories', (err, categories) => {
             if (err) {
                 console.error('Error getting categories:', err);
@@ -57,23 +57,52 @@ app.get('/', (req, res) => {
                 }
                 result[r.category].push(r);
             });
-     
+
             res.render('index', { recipes: result, categories: categories });
         });
     });
 });
 
 
+app.get('/recipes', (req, res) => {
+
+    db.all('SELECT * FROM recipes', (err, recipes) => {
+        if (err) {
+            console.error('Error getting recipes:', err);
+            res.sendStatus(500);
+            return;
+        }
+
+        db.all('SELECT * FROM categories', (err, categories) => {
+            if (err) {
+                console.error('Error getting categories:', err);
+                res.sendStatus(500);
+                return;
+            }
+
+            const result = {};
+            recipes.forEach(r => {
+                if (!result[r.category]) {
+                    result[r.category] = [];
+                }
+                result[r.category].push(r);
+            });
+
+            res.render('recipes/index', { recipes: result, categories: categories });
+        });
+    });
+});
+
 app.post('/getRecipe', async (req, res) => {
     try {
         const { message } = req.body;
         const response = await openai.chat.completions.create({
-            messages: [{"role": "system", "content": "You are a home cook."},
-                {"role": "user", "content": "Create a recipe for : " + message + ' and write it down in markdown format' } ],
-              
-           
+            messages: [{ "role": "system", "content": "You are a home cook." },
+            { "role": "user", "content": "Create a recipe for : " + message + ' and write it down in markdown format' }],
+
+
             model: "gpt-3.5-turbo",
-          });
+        });
 
         // Extract recipe suggestion from the response
         const recipe = response.choices[0];
@@ -95,16 +124,15 @@ app.get('/recipes/:id', (req, res) => {
             return;
         }
         recipe = recipe[0];
-        res.render('recipes/view', { recipe});
+        res.render('recipes/view', { recipe });
     });
 });
 
 
 
 
-app.post('/save', (req, res) => {
-    console.log(req.body)
-    const { recipe, category,title } = req.body;
+app.post('/recipes', (req, res) => {
+    const { recipe, category, title } = req.body;
     if (recipe) {
         db.run('INSERT INTO recipes (title, content, category) VALUES (?, ?, ?)', [title, recipe, category], (err) => {
             if (err) {
@@ -119,6 +147,22 @@ app.post('/save', (req, res) => {
     }
 });
 
+
+app.get('/categories', (req, res) => {
+
+
+    db.all('SELECT * FROM categories', (err, categories) => {
+        if (err) {
+            console.error('Error getting categories:', err);
+            res.sendStatus(500);
+            return;
+        }
+
+
+        res.render('categories/index', { categories: categories });
+    });
+
+});
 app.post('/categories', (req, res) => {
     const { name } = req.body;
     if (name) {

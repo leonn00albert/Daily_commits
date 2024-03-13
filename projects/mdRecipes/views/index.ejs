@@ -1,140 +1,155 @@
 <%- include('./partials/header') %>
-<%- include('./partials/nav') %>
-    <div class="container">
-        <h1>Recipe Book</h1>
+    <%- include('./partials/nav') %>
         <div class="container">
-            <div class="row justify-content-center"> <!-- Center the row horizontally -->
-                <div class="col-md-6"> <!-- Adjust the column width as needed -->
-                    <div class="m-3">
-                        <form action="/getRecipe" method="post">
-                            <div class="row">
-                                <div class="col">
-                                    <input type="text" name="message" class="form-control" id="exampleSelect1" />
+            <h1>Recipe Book</h1>
+            <div class="container">
+                <div class="row justify-content-center"> <!-- Center the row horizontally -->
+                    <div class="col-md-6"> <!-- Adjust the column width as needed -->
+                        <div class="m-3">
+                            <form action="/getRecipe" method="post">
+                                <div class="row">
+                                    <div class="col">
+                                        <input type="text" name="message" class="form-control" id="message"
+                                            placeholder="e.g Chicken pot pie.." />
+                                    </div>
+                                    <div class="col">
+                                        <button class="btn btn-primary" type="submit" id="getBtn">Get Recipe</button>
+                                    </div>
                                 </div>
-                                <div class="col">
-                                    <button class="btn btn-primary" type="submit" id="getBtn">Get Recipe</button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="m-3">
+                            <form action="/save" method="post">
+                                <input type="hidden" id="title" name="title" />
+                                <div class="row">
+                                    <div class="col">
+                                        <select name="category" class="form-select" id="category">
+                                            <% categories.forEach(category=> { %>
+                                                <option>
+                                                    <%= category.name %>
+                                                </option>
+                                                <% }); %>
+                                        </select>
+                                    </div>
+                                    <div class="col">
+                                        <button class="btn btn-primary" type="submit">Save Recipe</button>
+
+                                    </div>
                                 </div>
-                            </div>
-                        </form>
+
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        
-  
-        <form action="/save" method="post">
-            <input type="hidden" id="title" name="title"/>
-            <textarea name="recipe" rows="10" cols="50" placeholder="Enter your recipe in Markdown format"></textarea>
-            <br>
-            <label for="exampleSelect1" class="form-label mt-4">Category</label>
-            <div class="row">
-                <div class="col">
-                    <select name="category" class="form-select" id="exampleSelect1">
-                        <% categories.forEach(category=> { %>
-                            <option>
-                                <%= category.name %>
-                            </option>
-                        <% }); %>
-                    </select>
-                </div>
-                <div class="col">
-                    <button class="btn btn-primary" type="submit">Save Recipe</button>
+            <div class="container">
 
-                </div>
+                <textarea name="recipe" rows="10" cols="50"
+                    placeholder="Enter your recipe in Markdown format"></textarea>
             </div>
 
-        </form>
 
-        <form action="/categories" method="post">
-            <label for="exampleSelect1" class="form-label mt-4">Category</label>
-            <div class="row">
-                <div class="col">
-                    <input type="text" name="name" class="form-control" id="exampleSelect1" />
 
-                </div>
-                <div class="col">
-                    <button class="btn btn-primary" type="submit">Create Category</button>
+            <script>
+                const recipeContent = document.querySelectorAll('.recipe-content');
+                recipeContent.forEach(c => {
+                    c.innerHTML = marked.parse(c.innerHTML);
+                })
 
-                </div>
-            </div>
 
-        </form>
+                class RecipeApp {
+                    constructor() {
+                        this.form = document.querySelector('form[action="/getRecipe"]');
+                        this.textarea = document.querySelector('textarea[name="recipe"]');
+                        this.getBtn = document.getElementById('getBtn');
+                        this.title = document.getElementById('title');
+                        this.category = document.getElementById('category');
+                        this.title = document.getElementById('title');
+                        this.easyMDE = new EasyMDE();
 
-        <h2>Recipes</h2>
-
-        <ul class="nav nav-tabs" role="tablist">
-            <% categories.forEach(category=> { %>
-                <li class="nav-item" role="presentation">
-                    <a class="nav-link" data-bs-toggle="tab" id="<%= category %>-tab" href="#<%= category.name %>"
-                        aria-selected="false" role="tab">
-                        <%= category.name %>
-                    </a>
-                </li>
-                <% }); %>
-        </ul>
-        <div id="myTabContent" class="tab-content">
-            <% categories.forEach(category => { %>
-                <div class="tab-pane fade" id="<%= category.name %>" role="tabpanel">
-                    <ul>
-                        <% if (recipes[category.name]) { %>
-                            <% recipes[category.name].forEach(recipe => { %>
-                                <li>
-                                    <h3><a href=/<%= 'recipes/' + recipe.id %>><%= recipe.title %></a></h3>
-                                </li>
-                            <% }); %>
-                        <% } else { %>
-                            <li>No recipes found for this category.</li>
-                        <% } %>
-                    </ul>
-                </div>
-            <% }); %>
-        </div>
-        
-        
-
-        <script>
-            const easyMDE = new EasyMDE();
-            const recipeContent = document.querySelectorAll('.recipe-content');
-            recipeContent.forEach(c => {
-                c.innerHTML = marked.parse(c.innerHTML);
-            })
-
-  
-            document.addEventListener('DOMContentLoaded', async () => {
-                const form = document.querySelector('form[action="/getRecipe"]');
-                const textarea = document.querySelector('textarea[name="recipe"]');
-                const getBtn = document.getElementById('getBtn');
-                const title = document.getElementById('title');
-
-                form.addEventListener('submit', async (event) => {
-                    event.preventDefault();
-                    const formData = new FormData(form);
-                    const message = formData.get('message');
-                    
-                    try {
-                        getBtn.disabled = true;
-                        easyMDE.value('## Loading...');
-                        easyMDE.togglePreview();
-
-                        const response = await fetch('/getRecipe', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({ message })
-                        });
-                        const data = await response.json();
-                        const recipe = data.recipe;
-        
-                        easyMDE.value(recipe.message.content);
-                        const firstLine = recipe.message.content.split('\n')[0].replace(/#/g, "");
-                        title.value = firstLine;
-                        getBtn.disabled = false;
-                    } catch (error) {
-                        console.error('Error:', error);
+                        this.addEventListeners();
                     }
+
+                    addEventListeners() {
+                        this.form.addEventListener('submit', this.handleGetRecipe.bind(this));
+
+                        document.querySelector('form[action="/save"]').addEventListener('submit', this.handlePostRecipe.bind(this));
+                    }
+
+                    async handleGetRecipe(event) {
+                        event.preventDefault();
+                        const formData = new FormData(this.form);
+                        const message = formData.get('message');
+
+                        try {
+                            this.getBtn.disabled = true;
+                            this.easyMDE.value('## Loading...');
+                            this.easyMDE.togglePreview();
+
+                            const response = await fetch('/getRecipe', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({ message })
+                            });
+                            const data = await response.json();
+                            const recipe = data.recipe;
+
+                            this.easyMDE.value(recipe.message.content);
+                            const firstLine = recipe.message.content.split('\n')[0].replace(/#/g, "");
+                            this.title.value = firstLine;
+                            this.getBtn.disabled = false;
+                        } catch (error) {
+                            console.error('Error:', error);
+                            this.showAlert('danger', 'Failed to retrieve recipe.');
+                        }
+                    }
+
+                    async handlePostRecipe(event) {
+                        event.preventDefault();
+
+                        const title = this.title.value;
+                        const category = this.category.value;
+                        const recipe = this.easyMDE.value();
+
+                        try {
+                            const response = await fetch('/recipes', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({ title, category, recipe })
+                            });
+
+                            this.showAlert('success', 'Recipe created successfully.');
+                        } catch (error) {
+                            console.error('Error:', error);
+                            this.showAlert('danger', 'Failed to create recipe.');
+                        }
+                    }
+
+                    showAlert(type, message) {
+                        const alertDiv = document.createElement('div');
+                        alertDiv.classList.add('alert', `alert-${type}`, 'alert-dismissible', 'fade', 'show');
+                        alertDiv.setAttribute('role', 'alert');
+                        alertDiv.innerHTML = `
+                        <strong>${type.charAt(0).toUpperCase() + type.slice(1)}!</strong> ${message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    `;
+                        document.body.appendChild(alertDiv);
+                        setTimeout(() => {
+                            alertDiv.remove();
+                        }, 5000);
+                    }
+                }
+
+                document.addEventListener('DOMContentLoaded', () => {
+                    const app = new RecipeApp();
                 });
-            });
-        </script>
-        
-<%- include('./partials/footer') %>
+
+            </script>
+
+            <%- include('./partials/footer') %>
