@@ -1,0 +1,145 @@
+<%- include('./partials/header') %>
+    <%- include('./partials/nav') %>
+        <div class="container">
+            <h1>Recipe Book</h1>
+            <div class="container">
+                <div class="row justify-content-center"> <!-- Center the row horizontally -->
+                    <div class="col-md-6"> <!-- Adjust the column width as needed -->
+                        <div class="m-3">
+          
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="m-3">
+                            <form action="/save" method="post">
+                                <input type="hidden" id="title" name="title" />
+                                <div class="row">
+                                    <div class="col">
+                                        <select name="category" class="form-select" id="category">
+                                            <% categories.forEach(category=> { %>
+                                                <option>
+                                                    <%= category.name %>
+                                                </option>
+                                                <% }); %>
+                                        </select>
+                                    </div>
+                                    <div class="col">
+                                        <button class="btn btn-primary" type="submit">Save Recipe</button>
+
+                                    </div>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="container">
+
+                <textarea name="recipe" rows="10" cols="50"
+                    placeholder="Enter your recipe in Markdown format"></textarea>
+            </div>
+
+
+
+            <script>
+                const recipeContent = document.querySelectorAll('.recipe-content');
+                recipeContent.forEach(c => {
+                    c.innerHTML = marked.parse(c.innerHTML);
+                })
+
+
+                class RecipeApp {
+                    constructor() {
+                        this.form = document.querySelector('form[action="/getRecipe"]');
+                        this.textarea = document.querySelector('textarea[name="recipe"]');
+                        this.getBtn = document.getElementById('getBtn');
+                        this.title = document.getElementById('title');
+                        this.category = document.getElementById('category');
+                        this.title = document.getElementById('title');
+                        this.easyMDE = new EasyMDE();
+                        this.easyMDE.value(<%= recipe.content %>);
+                        this.addEventListeners();
+                    }
+
+                    addEventListeners() {
+                        this.form.addEventListener('submit', this.handleGetRecipe.bind(this));
+
+                        document.querySelector('form[action="/save"]').addEventListener('submit', this.handlePostRecipe.bind(this));
+                    }
+
+                    async handleGetRecipe(event) {
+                        event.preventDefault();
+                        const formData = new FormData(this.form);
+                        const message = formData.get('message');
+
+                        try {
+                            this.getBtn.disabled = true;
+                            this.easyMDE.value('## Loading...');
+                            this.easyMDE.togglePreview();
+
+                            const response = await fetch('/getRecipe', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({ message })
+                            });
+                            const data = await response.json();
+                            const recipe = data.recipe;
+
+                            this.easyMDE.value(recipe.message.content);
+                            const firstLine = recipe.message.content.split('\n')[0].replace(/#/g, "");
+                            this.title.value = firstLine;
+                            this.getBtn.disabled = false;
+                        } catch (error) {
+                            console.error('Error:', error);
+                            this.showAlert('danger', 'Failed to retrieve recipe.');
+                        }
+                    }
+
+                    async handlePostRecipe(event) {
+                        event.preventDefault();
+
+                        const title = this.title.value;
+                        const category = this.category.value;
+                        const recipe = this.easyMDE.value();
+
+                        try {
+                            const response = await fetch('/recipes', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({ title, category, recipe })
+                            });
+
+                            this.showAlert('success', 'Recipe created successfully.');
+                        } catch (error) {
+                            console.error('Error:', error);
+                            this.showAlert('danger', 'Failed to create recipe.');
+                        }
+                    }
+
+                    showAlert(type, message) {
+                        const alertDiv = document.createElement('div');
+                        alertDiv.classList.add('alert', `alert-${type}`, 'alert-dismissible', 'fade', 'show');
+                        alertDiv.setAttribute('role', 'alert');
+                        alertDiv.innerHTML = `
+                        <strong>${type.charAt(0).toUpperCase() + type.slice(1)}!</strong> ${message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    `;
+                        document.body.appendChild(alertDiv);
+                        setTimeout(() => {
+                            alertDiv.remove();
+                        }, 5000);
+                    }
+                }
+
+                document.addEventListener('DOMContentLoaded', () => {
+                    const app = new RecipeApp();
+                });
+
+            </script>
+
+            <%- include('./partials/footer') %>

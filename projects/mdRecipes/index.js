@@ -127,6 +127,18 @@ app.get('/recipes/:id', (req, res) => {
         res.render('recipes/view', { recipe });
     });
 });
+app.get('/recipes/:id/edit', (req, res) => {
+
+    const recipeId = req.params.id
+    db.all('SELECT * FROM recipes WHERE id = ? LIMIT 1', [recipeId], (err, recipe) => {
+        if (err) {
+            console.error('Error getting recipe:', err);
+            return;
+        }
+        recipe = recipe[0];
+        res.render('recipes/edit', { recipe });
+    });
+});
 
 
 
@@ -147,6 +159,33 @@ app.post('/recipes', (req, res) => {
     }
 });
 
+app.put('/recipes/:id', (req, res) => {
+    const { id } = req.params;
+    const { recipe, category, title } = req.body;
+
+    // Assuming db is defined elsewhere
+    db.run('UPDATE recipes SET title = ?, content = ?, category = ? WHERE id = ?', [title, recipe, category, id], (err) => {
+        if (err) {
+            console.error('Error updating recipe:', err);
+            res.sendStatus(500);
+            return;
+        }
+        res.sendStatus(200); // Successful update
+    });
+});
+
+app.delete('/recipes/:id', (req, res) => {
+    const { id } = req.params;
+
+    db.run('DELETE FROM recipes WHERE id = ?', id, (err) => {
+        if (err) {
+            console.error('Error deleting recipe:', err);
+            res.sendStatus(500);
+            return;
+        }
+        res.sendStatus(200); // Successful deletion
+    });
+});
 
 app.get('/categories', (req, res) => {
 

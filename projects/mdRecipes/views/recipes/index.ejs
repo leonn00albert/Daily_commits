@@ -2,14 +2,14 @@
 <%- include('../partials/nav') %>
 <div class="container">
     <ul class="nav nav-tabs" role="tablist">
-        <% categories.forEach(category=> { %>
+        <% categories.forEach(category => { %>
             <li class="nav-item" role="presentation">
                 <a class="nav-link" data-bs-toggle="tab" id="<%= category %>-tab" href="#<%= category.name %>"
                     aria-selected="false" role="tab">
                     <%= category.name %>
                 </a>
             </li>
-            <% }); %>
+        <% }); %>
     </ul>
     <div id="myTabContent" class="tab-content">
         <% categories.forEach(category => { %>
@@ -18,7 +18,8 @@
                     <% if (recipes[category.name]) { %>
                         <% recipes[category.name].forEach(recipe => { %>
                             <li>
-                                <h3><a href=/<%= 'recipes/' + recipe.id %>><%= recipe.title %></a></h3>
+                                <h3><a href="/recipes/<%= recipe.id %>"><%= recipe.title %></a></h3>
+                                <button class="btn btn-danger delete-recipe" data-recipe-id="<%= recipe.id %>">Delete</button>
                             </li>
                         <% }); %>
                     <% } else { %>
@@ -28,7 +29,30 @@
             </div>
         <% }); %>
     </div>
-
 </div>
 
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const deleteButtons = document.querySelectorAll('.delete-recipe');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', async () => {
+                const recipeId = button.getAttribute('data-recipe-id');
+                try {
+                    const response = await fetch(`/recipes/${recipeId}`, {
+                        method: 'DELETE'
+                    });
+                    if (response.ok) {
+                        // Refresh page or remove deleted recipe from DOM
+                        location.reload(); // This reloads the page after successful deletion
+                    } else {
+                        console.error('Failed to delete recipe');
+                    }
+                } catch (error) {
+                    console.error('Error deleting recipe:', error);
+                }
+            });
+        });
+    });
+</script>
 <%- include('../partials/footer') %>
+

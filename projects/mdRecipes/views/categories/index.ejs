@@ -13,7 +13,12 @@
 
             </div>
         </div>
-
+        <ul>
+            <% categories.forEach(category => { %>
+          <li><%=category.name %></li>
+                <% }); %>
+        </ul>
+   
     </form>
 </div>
 
