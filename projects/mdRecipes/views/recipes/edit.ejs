@@ -1,39 +1,15 @@
 <%- include('./partials/header') %>
     <%- include('./partials/nav') %>
         <div class="container">
-            <h1>Recipe Book</h1>
-            <div class="container">
-                <div class="row justify-content-center"> <!-- Center the row horizontally -->
-                    <div class="col-md-6"> <!-- Adjust the column width as needed -->
-                        <div class="m-3">
-          
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="m-3">
-                            <form action="/save" method="post">
-                                <input type="hidden" id="title" name="title" />
-                                <div class="row">
-                                    <div class="col">
-                                        <select name="category" class="form-select" id="category">
-                                            <% categories.forEach(category=> { %>
-                                                <option>
-                                                    <%= category.name %>
-                                                </option>
-                                                <% }); %>
-                                        </select>
-                                    </div>
-                                    <div class="col">
-                                        <button class="btn btn-primary" type="submit">Save Recipe</button>
-
-                                    </div>
-                                </div>
-
-                            </form>
-                        </div>
-                    </div>
+                <h3>
+                    <%= recipe.title %>
+                </h3>
+                <div class="recipe-content">
+                    <%= recipe.content %>
                 </div>
-            </div>
+        
+        
+        
             <div class="container">
 
                 <textarea name="recipe" rows="10" cols="50"
