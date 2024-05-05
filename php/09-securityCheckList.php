@@ -1,5 +1,7 @@
 <?php 
 
+require('./05-FileCache.php');
+
 enum SecurityType:string {
     case AUTHENTICATION = 'authentication';
     case WEB = 'web';
@@ -9,12 +11,18 @@ enum SecurityType:string {
 }
 
 
+
 class SecurityCheckList {
+    private FileCache $store;
     public function __construct(private array $items = []) {
-        
+        $this->store =  new FileCache();
+        $this->store->setData('list',$items);
     }
     public function addItem(Item $item){
-        $this->items[] = $item;
+      $this->items = json_decode($this->store->getData('list'));
+      $this->items[] = $item;     
+      $this->store->setData('list',$item);
+
     }
     
     private function calculateScore(){
@@ -26,6 +34,11 @@ class SecurityCheckList {
             }
         }
         return $score;
+    }
+
+    public function getList(){
+      return $this->store->getData('list');
+        
     }
 
 }
@@ -57,11 +70,18 @@ class Item {
 
 class CLI {
 
-    
+    private SecurityCheckList $list;
+    public function __construct(){
+        $this->list = new SecurityCheckList();
+    }
+
     public function menu(){
         
         print(
-            "1. Add list Item \n"
+            "1. Add list Item \n
+             2. List Items \n
+            "
+            
         );
         $option = readline("Select option: \n"); 
 
@@ -86,14 +106,15 @@ class CLI {
         };
 
         $item = new Item($name, $st);
-
-        
+        $this->list->addItem($item);
+        $this->menu();
 
     }
 
     private function listItems(){
+        print_r($this->list->getList());
+
     }
 }
-
 $cli = new CLI();
 $cli->menu();
